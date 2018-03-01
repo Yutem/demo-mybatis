@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xuanrui.demomybatis.mapper.RoleMapper">
+
+
+	<!-- 通过登录的用户id查询权限 -->	
+	<select id="findRole" parameterType="java.lang.Integer" resultType="com.xuanrui.demomybatis.model.Role">
+		select *  from role where id in (
+				select role.id  from user_role  join role on user_role.roleid = role.id where user_role.userid = #{id}
+		)
+	</select>
+
+
+	<!-- 查询用户和角色的所有信息  -->
+	<select id="findUserRole" parameterType="java.lang.Integer"  resultType="com.xuanrui.demomybatis.vo.UserLinkRole">
+			select  u.*, r.* 	from user u
+			LEFT join user_role ur on u.id = ur.userid
+			LEFT join role r on ur.roleid =r.id
+			where u.id = #{id}
+	</select>
+
+	<!-- 通过用户名和角色名查询用户和角色的所有信息  -->
+	<select id="selectUserRole" parameterType="java.lang.Integer" resultType="com.xuanrui.demomybatis.vo.UserLinkRole">
+		sewherelect * from user join user_role on user.id = user_role.userid join role  on user_role.roleid = role.id
+		 1 = 1
+		<if test="name != null and name != ''">
+			and name = #{name}
+		</if>
+		<if test="rolename != null and rolename != ''">
+			and rolename = #{rolename}
+		</if>
+	</select>
+
+	<!-- 通过角色id查询角色信息 -->
+	<select id="selectRoleById" parameterType="java.lang.Integer" resultType="com.xuanrui.demomybatis.model.Role">
+		select * from role r where r.id = #{id}
+	</select>
+	
+	<!-- 增加角色信息 -->
+	<select id="insertRole" parameterType="com.xuanrui.demomybatis.model.Role">
+		insert into role (rolename,roledesc,rolestatus,createaccount,createtime,updateaccount,updatetime,available)
+				values (#{role.rolename},#{role.roledesc},#{role.rolestatus},#{role.createaccount},#{role.createtime},#{role.updateaccount},#{role.updatetime},#{role.available})
+	</select>
+
+	<!-- 删除角色信息 -->
+	<delete id="deleteRole" parameterType="java.lang.Integer">
+		DELETE from role where id = #{id}
+	</delete>
+
+	<!-- 软删除角色信息 -->
+	<update id="softDeleteRole" parameterType="java.lang.Integer">
+		update role set available = 0 where id = #{id}
+	</update>
+</mapper>

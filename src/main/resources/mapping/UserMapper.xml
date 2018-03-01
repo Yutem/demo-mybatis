@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xuanrui.demomybatis.mapper.UserMapper">
+    <resultMap id="UserResultMap" type="com.xuanrui.demomybatis.model.User">
+        <id property="id" column="userId" />
+        <result property="name" column="userName"  />
+        <result property="password" column="password" />
+        <result property="organizationid" column="organizationid" />
+        <result property="nickname" column="nickname" />
+        <result property="phone" column="phone" />
+        <result property="city" column="city" />
+        <result property="createtime" column="createtime" />
+        <result property="createaccount" column="createaccount" />
+        <result property="updatetime" column="updatetime" />
+        <result property="updateaccount" column="updateaccount" />
+        <result property="available" column="available" />
+
+        <association property="roles" javaType="com.xuanrui.demomybatis.model.Role">
+            <id property="id" column="id"/>
+            <result property="rolename" column="rolename"/>
+            <result property="roledesc" column="roledesc"/>
+            <result property="rolestatus" column="rolestatus"/>
+            <result property="createaccount" column="createaccount"/>
+            <result property="createtime" column="createtime"/>
+            <result property="updateaccount" column="updateaccount"/>
+            <result property="updatetime" column="updatetime"/>
+            <result property="available" column="available"/>
+        </association>
+    </resultMap>
+
+  <!-- 通过id查询用户和角色的信息 -->
+  <select id="selectUserRole"  resultMap="UserResultMap"  parameterType="java.lang.Integer">
+      select
+      u.*
+      from user u
+	  join user_role ur on u.id = ur.userid
+	  join role r on ur.roleid =r.id
+	  where u.id = #{id}
+  </select>
+
+
+  <!-- 根据用户名判断用户是都存在 -->
+  <select id="loginUser" parameterType="java.lang.String" resultType="com.xuanrui.demomybatis.model.User" >
+      select user.* from user where name = #{name} and password = #{password} and available = 1
+  </select>
+
+  <!-- 根据用户id查询用户信息是都存在 -->
+  <select id="findUserById" parameterType="java.lang.Integer" resultType="com.xuanrui.demomybatis.model.User">
+    select * from user where user.id=#{id} and  available = 1
+  </select>
+
+  <!-- 查询用户的所有信息 -->
+  <select id = "findAllUser"  resultType="com.xuanrui.demomybatis.model.User">
+    select * from user where  available = 1
+  </select>
+
+  <!-- 新增一个用户信息 -->
+  <insert id="insertUser" parameterType="com.xuanrui.demomybatis.model.User" useGeneratedKeys="true" keyProperty="user.id">
+      insert into user(name,password,organizationid,nickname,phone,city,createtime,createaccount,updatetime,updateaccount,available)
+      values(#{user.name},#{user.password},#{user.organizationid},#{user.nickname},#{user.phone},#{user.city},#{user.createtime},#{user.createaccount},#{user.updatetime},#{user.updateaccount},#{user.available})
+  </insert>
+
+  <!-- 删除一个用户信息 -->
+  <delete id="deleteUser" parameterType="java.lang.Integer">
+    delete from user where user.id = #{id}
+  </delete>
+
+  <!-- 软删除一个用户信息 -->
+  <update id="softDeleteUser" parameterType="java.lang.Integer">
+      UPDATE  user set available = 0 where id = #{id}
+  </update>
+
+  <!-- 更改用户信息-->
+  <update id="updateUser" parameterType="com.xuanrui.demomybatis.model.User">
+    UPDATE user
+    <set>
+        <if test="name != null">
+            name = #{name},
+        </if>
+        <if test="password != null">
+            password = #{password},
+        </if>
+        <if test="organizationid != null">
+            organizationid = #{organizationid},
+        </if>
+        <if test="nickname != null">
+            nickname = #{nickname},
+        </if>
+        <if test="phone != null">
+            phone = #{phone},
+        </if>
+        <if test="city != null">
+            city = #{city},
+        </if>
+        <if test="createtime != null">
+            createtime = #{createtime},
+        </if>
+        <if test="createaccount != null">
+            createaccount = #{createaccount},
+        </if>
+        <if test="updatetime != null">
+            updatetime = #{updatetime},
+        </if>
+        <if test="updateaccount != null">
+            updateaccount = #{updateaccount},
+        </if>
+        <if test="available != null">
+            available = #{available},
+        </if>
+    </set>
+    WHERE id = #{id}
+  </update>
+</mapper>
